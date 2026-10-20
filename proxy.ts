@@ -1,0 +1,4 @@
+import {NextRequest,NextResponse} from 'next/server';
+import {timingSafeEqual} from 'node:crypto';
+export function proxy(req:NextRequest){const required=process.env.SITE_PASSWORD;if(!required)return new NextResponse('Site setup is incomplete. Configure SITE_PASSWORD.',{status:503});const header=req.headers.get('authorization');if(header?.startsWith('Basic ')){try{const raw=Buffer.from(header.slice(6),'base64').toString('utf8');const supplied=Buffer.from(raw.slice(raw.indexOf(':')+1));const expected=Buffer.from(required);if(supplied.length===expected.length&&timingSafeEqual(supplied,expected))return NextResponse.next()}catch{}}return new NextResponse('School access password required.',{status:401,headers:{'WWW-Authenticate':'Basic realm="KK2 English Panel", charset="UTF-8"','Cache-Control':'no-store'}})}
+export const config={matcher:['/((?!_next/static|_next/image|favicon.ico).*)']};

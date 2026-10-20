@@ -1,0 +1,3 @@
+import {getSql} from '../../../db';
+import {timingSafeEqual} from 'node:crypto';
+export async function GET(req:Request){const key=process.env.ADMIN_KEY;const supplied=Buffer.from(req.headers.get('x-admin-key')||'');const expected=Buffer.from(key||'');if(!key||supplied.length!==expected.length||!timingSafeEqual(supplied,expected))return Response.json({error:'Incorrect dashboard password.'},{status:401});try{const sql=getSql();const rows=await sql`SELECT * FROM readings ORDER BY received DESC LIMIT 10000`;return Response.json({rows},{headers:{'Cache-Control':'no-store'}})}catch{return Response.json({error:'Database setup is incomplete or unavailable.'},{status:503})}}
